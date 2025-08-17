@@ -1,38 +1,240 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+body,
+#root,
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+}
+
+.screen, .card-screen {
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 22px;
+  max-width: 480px;
+  min-width: 260px;
+  min-height: 600px;
+  height: 90vh;
+  box-shadow: 0 2px 16px rgba(30,100,160,0.13);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  padding: 2.2rem 1.2rem 2rem 1.2rem;
+  width: 95vw;
+}
+
+/* Numbers Grid */
+.numbers-card {
+  margin: 1.3rem 0 1rem 0;
+  background: #f0f7fd;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  font-size: 1.1rem;
+  width: 100%;
+  max-width: 340px;
+  min-width: 180px;
+  box-sizing: border-box;
+}
+
+.numbers-card span {
+  background: #3081d0;
+  color: #fff;
+  padding: 0.52rem 0;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  display: inline-block;
+  text-align: center;
+}
+
+.choices {
+  margin-top: 1.3rem;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  gap: 1.2rem;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-primary,
+.btn-yes,
+.btn-no,
+.btn-restart {
+  font-size: 1.07rem;
+  margin: 0.23rem 0.6rem;
+  padding: 0.75rem 2.1rem;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  color: #fff;
+  background: #3081d0;
+  transition: background 0.18s;
+  min-width: 118px;
+  box-sizing: border-box;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.btn-yes { background: #42b983; }
+.btn-no  { background: #f15151; }
+.btn-restart {
+  background: #f15151;
+  font-weight: 600;
+  min-width: 110px;
+  padding: 0.65rem 1.5rem;
+  float: right;
+  margin-left: auto;
+  margin-top: 0.17rem;
+}
+.btn-primary:hover,
+.btn-yes:hover,
+.btn-no:hover,
+.btn-restart:hover {
+  filter: brightness(1.06);
+}
+
+.result {
+  font-size: 2.2rem;
+  color: #42b983;
+  margin: 1.3rem 0;
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  animation: reveal-pop 0.7s cubic-bezier(.32,1.84,.53,.91);
+}
+
+/* Status Bar */
+.status-bar {
+  margin: 0.3rem auto 1.1rem auto;
+  width: 97vw;
+  max-width: 450px;
+  box-sizing: border-box;
+}
+.status-label {
+  font-size: 1.1rem;
+  color: #206baa;
+  text-align: left;
+  margin-bottom: 0.45rem;
+}
+.progress-container {
+  background: #e3eefb;
+  border-radius: 70px;
+  height: 14px;
+  width: 100%;
+}
+.progress-bar {
+  height: 14px;
+  border-radius: 80px;
+  background: linear-gradient(90deg, #3081d0 70%, #42b983);
+  transition: width 0.25s;
+}
+
+/* Top bar and Restart Button */
+.top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  min-height: 44px;
+}
+
+.btn-restart {
+  background: #f15151;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.65rem 1.5rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  float: right;
+  min-width: 110px;
+}
+
+/* Thinking Loader */
+.thinking-loader {
+  display: flex;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-top: 2rem;
+}
+.thinking-loader .dot {
+  width: 1rem;
+  height: 1rem;
+  background: #3081d0;
+  border-radius: 50%;
+  animation: thinking-bounce 1s infinite alternate;
+  opacity: 0.8;
+}
+.thinking-loader .dot:nth-child(2) { animation-delay: 0.29s; }
+.thinking-loader .dot:nth-child(3) { animation-delay: 0.52s; }
+@keyframes thinking-bounce {
+  to { transform: translateY(-0.8rem); opacity: 1; }
+}
+@keyframes reveal-pop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  70%  { transform: scale(1.13); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Responsive: On small screens, let card auto-fit */
+@media (max-width: 600px), (max-height: 700px) {
+  .App {
+    padding: 1rem 0.1rem;
+    height: 100vh;
   }
-  to {
-    transform: rotate(360deg);
+  .screen, .card-screen {
+    padding: 1.1rem 0.15rem 0.8rem 0.15rem;
+    min-width: 0;
+    min-height: unset;
+    height: unset;
+    max-width: 99vw;
+    width: 99vw;
+    margin: 0.2rem;
+    border-radius: 10px;
+    align-items: stretch;
+    justify-content: flex-start;
   }
+  .numbers-card {
+    font-size: 0.9rem;
+    max-width: 97vw;
+    gap: 0.32rem;
+    padding: 0.2rem;
+    border-radius: 7px;
+  }
+  .numbers-card span {
+    font-size: 0.7rem;
+    padding: 0.12rem 0;
+  }
+  .btn-primary, .btn-yes, .btn-no, .btn-restart {
+    font-size: 0.92rem;
+    padding: 0.55rem 0.9rem;
+    min-width: 70px;
+    margin: 0.11rem 0.3rem;
+  }
+  .choices { gap: 0.7rem; }
+  .result { font-size: 1.1rem; }
+  .status-bar { max-width: 310px; }
 }
