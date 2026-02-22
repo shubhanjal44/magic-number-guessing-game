@@ -1,3 +1,20 @@
+## Binary Magic Trick 🎩✨
+
+An interactive CLI game that demonstrates how computers process numbers 
+using binary representation. Think of any number between 1-63, and the 
+program will guess it in exactly 6 questions!
+
+### How It Works
+- Uses bitwise operations to generate 6 cards (bit positions 0-5)
+- Each card contains numbers where specific bit = 1
+- Reconstructs your number by summing powers of 2
+- 100% accuracy, O(log₂n) efficiency
+
+### Technical Highlights
+- Bit manipulation (`>>`, `&`)
+- Binary-to-decimal conversion
+- Async I/O with readline
+- Algorithm visualization
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

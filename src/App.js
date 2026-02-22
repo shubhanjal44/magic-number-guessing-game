@@ -30,14 +30,19 @@ const cards = generateCards();
 
 // Utility to play sound
 const playSound = (src) => {
-  const audio = new window.Audio(src);
-  audio.play();
+  try {
+    const audio = new window.Audio(src);
+    audio.play().catch(e => console.log('Audio play failed:', e));
+  } catch (e) {
+    console.log('Audio format not supported or file missing.', e);
+  }
 };
 
 function App() {
-  const [step, setStep] = useState("start"); // start screen by default
+  const [step, setStep] = useState("start"); // start, play, thinking, reveal
   const [cardIndex, setCardIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
 
   const [width, height] = useWindowSize();
 
@@ -60,14 +65,14 @@ function App() {
     const updated = [...answers, yes];
     setAnswers(updated);
     playSound(process.env.PUBLIC_URL + "/sounds/question.mp3");
+    
     if (cardIndex < cards.length - 1) {
       setCardIndex(cardIndex + 1);
     } else {
-      // Show thinking animation before reveal
       setStep("thinking");
       setTimeout(() => {
         setStep("reveal");
-      }, 1800); // 1.8 seconds thinking time
+      }, 2000); // 2 seconds thinking time
     }
   };
 
@@ -88,24 +93,34 @@ function App() {
 
   return (
     <div className="App">
-      {/* Universal Restart Button */}
+      {/* Top Bar for universally accessible buttons */}
       <div className="top-bar">
         <button
-          className="btn-restart"
-          onClick={handleRestart}
-          title="Restart Game"
+          className="btn-info"
+          onClick={() => setShowHowItWorks(true)}
+          title="How does it work?"
         >
-          ⟳ Restart
+          ℹ️ How It Works
         </button>
+        {step !== "start" && (
+          <button
+            className="btn-restart"
+            onClick={handleRestart}
+            title="Restart Game"
+          >
+            ⟳ Restart
+          </button>
+        )}
       </div>
 
-      <h1>Magic Number Guessing</h1>
+      <h1>Magic Number</h1>
 
       {/* Status Bar: Only show during play */}
       {step === "play" && (
         <div className="status-bar">
           <div className="status-label">
-            Question {cardIndex + 1} / {cards.length}
+            <span>Question {cardIndex + 1} of {cards.length}</span>
+            <span>{Math.round(((cardIndex + 1) / cards.length) * 100)}%</span>
           </div>
           <div className="progress-container">
             <div
@@ -121,12 +136,13 @@ function App() {
       {/* Start Screen */}
       {step === "start" && (
         <div className="screen">
+          <h2>Mind Reading Trick</h2>
           <p>
             Think of a number between <b>1 and 63</b>.<br />
-            I’ll try to read your mind with 6 questions!
+            Keep it a secret! I will read your mind using 6 simple questions.
           </p>
           <button onClick={startGame} className="btn-primary">
-            Start
+            Start Magic
           </button>
         </div>
       )}
@@ -134,11 +150,6 @@ function App() {
       {/* Question Cards */}
       {step === "play" && (
         <div className="card-screen">
-          <p>
-            <b>
-              Question {cardIndex + 1} of {cards.length}
-            </b>
-          </p>
           <p>Is your number in this set?</p>
           <div className="numbers-card">
             {cards[cardIndex].map((n) => (
@@ -146,11 +157,11 @@ function App() {
             ))}
           </div>
           <div className="choices">
-            <button onClick={() => handleAnswer(true)} className="btn-yes">
-              Yes
-            </button>
             <button onClick={() => handleAnswer(false)} className="btn-no">
-              No
+              ✗ No
+            </button>
+            <button onClick={() => handleAnswer(true)} className="btn-yes">
+              ✓ Yes
             </button>
           </div>
         </div>
@@ -159,7 +170,8 @@ function App() {
       {/* Thinking Animation */}
       {step === "thinking" && (
         <div className="screen">
-          <p>Let me think...</p>
+          <h2>Reading your mind...</h2>
+          <p>Analyzing the binary patterns...</p>
           <div className="thinking-loader">
             <span className="dot"></span>
             <span className="dot"></span>
@@ -171,15 +183,37 @@ function App() {
       {/* Reveal Result with Full Screen Confetti */}
       {step === "reveal" && (
         <>
-          <Confetti width={width} height={height} />
-          <div className="screen" style={{ position: "relative" }}>
-            <p>Your number is:</p>
+          <Confetti width={width} height={height} numberOfPieces={300} recycle={false} />
+          <div className="screen">
+            <p>The number you're thinking of is...</p>
             <h2 className="result">{computeNumber()}</h2>
             <button onClick={handleRestart} className="btn-primary">
               Play Again
             </button>
           </div>
         </>
+      )}
+
+      {/* How It Works Modal */}
+      {showHowItWorks && (
+        <div className="modal-overlay" onClick={() => setShowHowItWorks(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="btn-close" onClick={() => setShowHowItWorks(false)}>×</button>
+            <h2>How It Works</h2>
+            <p>
+              This trick is based on <b>Binary Numbers</b> (Base 2). Every number from 1 to 63 can be represented by exactly 6 binary bits (e.g., 63 is <code>111111</code>, 1 is <code>000001</code>).
+            </p>
+            <ul>
+              <li>There are 6 cards, each representing a bit position (1, 2, 4, 8, 16, 32).</li>
+              <li>A card displays a number if its corresponding bit is a <code>1</code> in binary.</li>
+              <li>When you answer "Yes," the program adds the value of that bit to a running total.</li>
+              <li>After 6 questions, all the "Yes" values are summed up to reveal your exact number!</li>
+            </ul>
+            <p>
+              <i>Example:</i> If you think of 5 (binary <code>101</code>), you will say "Yes" to the 1st card (+1) and the 3rd card (+4). 1 + 4 = 5.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
